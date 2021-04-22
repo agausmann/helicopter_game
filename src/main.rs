@@ -87,14 +87,37 @@ impl GameField {
     /// Draw a player where ([`PLAYER_X`], `self.player_y`) is the top left
     /// coord of the players collision square which is [`PLAYER_SIZE`]
     fn draw_player(&mut self) {
-        // Default player
-        self.objects.push(Object::Rectangle {
-            x:      PLAYER_X,
-            y:      self.player_y,
-            width:  PLAYER_SIZE,
-            height: PLAYER_SIZE,
-            color:  RED,
-        });
+        const RANDOM_DATA: &[u8] = include_bytes!("random_data.bin");
+        for a in 0..248 {
+            for b in 0..248 {
+                self.objects.push(Object::Rectangle {
+                    x: Fxpt((GAME_FIELD_WIDTH.0 as i32 * b / 248) as _),
+                    y: Fxpt((GAME_FIELD_HEIGHT.0 as i32 * a / 248) as _),
+                    width: Fxpt(
+                        (GAME_FIELD_WIDTH.0 as i32 * (b + 1) / 248
+                            - GAME_FIELD_WIDTH.0 as i32 * b / 248) as _,
+                    ),
+                    height: Fxpt(
+                        (GAME_FIELD_HEIGHT.0 as i32 * (a + 1) / 248
+                            - GAME_FIELD_HEIGHT.0 as i32 * a / 248) as _,
+                    ),
+                    color: Color::from_rgba(
+                        RANDOM_DATA[184512 * (self.frames as usize / 4 % 46)
+                            + (a as usize) * 744
+                            + (b as usize) * 3],
+                        RANDOM_DATA[184512 * (self.frames as usize / 4 % 46)
+                            + (a as usize) * 744
+                            + (b as usize) * 3
+                            + 1],
+                        RANDOM_DATA[184512 * (self.frames as usize / 4 % 46)
+                            + (a as usize) * 744
+                            + (b as usize) * 3
+                            + 2],
+                        255,
+                    ),
+                });
+            }
+        }
     }
 
     fn render(&mut self) -> Result<()> {
